@@ -1,0 +1,9 @@
+name: ${project.artifactId}
+main: ${project.groupId}.${project.artifactId}
+version: ${project.version}
+depend: [Vault]
+load: STARTUP
+commands:
+  permissions:
+    description: "Access commands"
+    aliases: [perms]
