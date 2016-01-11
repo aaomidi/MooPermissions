@@ -3,7 +3,6 @@ package com.aaomidi.moopermissions.engine;
 import com.aaomidi.moopermissions.MooPermissions;
 import com.aaomidi.moopermissions.engine.registeries.GroupIndexRegistry;
 import com.aaomidi.moopermissions.model.perms.player.MPlayer;
-import com.aaomidi.moopermissions.utils.StringManager;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.bukkit.Bukkit;
@@ -13,7 +12,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.logging.Level;
 
 /**
  * Created by amir on 2015-12-17.
@@ -86,9 +84,7 @@ public class CacheManager {
         if (mPlayer == null) {
             throw new RuntimeException(new NoSuchElementException("MPlayer could not be initialized."));
         }
-        StringManager.log(Level.INFO, "&bApplying perms.");
         mPlayer.apply();
-        StringManager.log(Level.INFO, "&bApplied.");
         /* Put them inside a map */
         playerReferenceMap.put(player, mPlayer);
         playerNameMap.put(playerName, mPlayer);
