@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class ConnectionEvent implements Listener {
     private final MooPermissions instance;
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
         instance.getCacheManager().initializePlayer(player);
