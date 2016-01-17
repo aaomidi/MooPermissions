@@ -77,7 +77,7 @@ public class CommandHandler implements CommandExecutor {
         register(new HasCommand("Has", "Checks if a player has a permission.", "h"));
         register(new PlayerInfoCommand("Info", "Prints out information about the player.", "pi"));
         register(new SetGroupCommand("SetGroup", "Sets a player's group to the specified group.", "sg"));
-        register(new SetPermissionCommand("SetPermission", "Sets a permission for a player.", "sp"));
+        register(new SetPermissionCommand("SetPermission", "Sets a permission for a player.", "setperm", "sp"));
     }
 
     @SuppressWarnings("Duplicates")

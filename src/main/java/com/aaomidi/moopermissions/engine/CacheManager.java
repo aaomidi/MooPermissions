@@ -131,12 +131,13 @@ public class CacheManager {
 
     public void cleanUpPlayer(Player player) {
         MPlayer mPlayer = playerReferenceMap.get(player);
-
-        playerReferenceMap.remove(player);
-        playerNameMap.remove(player.getName());
-        playerUUIDMap.remove(player.getUniqueId());
-
         if (mPlayer != null) {
+            mPlayer.getLock().lock();
+
+            playerReferenceMap.remove(player);
+            playerNameMap.remove(player.getName());
+            playerUUIDMap.remove(player.getUniqueId());
+
             queue.remove(mPlayer);
         }
     }
