@@ -1,8 +1,8 @@
 name: ${project.artifactId}
 main: ${project.groupId}.${project.artifactId}
 version: ${project.version}
-depend: [Vault]
 load: STARTUP
+loadbefore: [Vault]
 commands:
   permissions:
     description: "Access commands"

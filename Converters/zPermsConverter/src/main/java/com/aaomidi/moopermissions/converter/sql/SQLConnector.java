@@ -1,6 +1,6 @@
-package com.aaomidi.moopermissions.sql;
+package com.aaomidi.moopermissions.converter.sql;
 
-import com.aaomidi.moopermissions.MooPermissions;
+import com.aaomidi.moopermissions.converter.ZPermsConverter;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  */
 public class SQLConnector {
     @Getter
-    private final MooPermissions instance;
+    private final ZPermsConverter instance;
     private final String host;
     private final int port;
     private final String username;
@@ -28,7 +28,7 @@ public class SQLConnector {
     private Connection connection;
     private Logger logger;
 
-    public SQLConnector(MooPermissions instance, String host, int port, String username, String password, String database) {
+    public SQLConnector(ZPermsConverter instance, String host, int port, String username, String password, String database) {
         this.instance = instance;
         this.host = host;
         this.port = port;
@@ -36,13 +36,12 @@ public class SQLConnector {
         this.password = password;
         this.database = database;
 
-        this.logger = instance.getLogger();
+        this.logger = Logger.getLogger("zPerms-Converter");
         this.createHikariDataSource();
     }
 
     private void createHikariDataSource() {
         try {
-
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl(String.format("jdbc:mysql://%s:%d/%s?zeroDateTimeBehavior=convertToNull", this.host, this.port, this.database));
             config.setUsername(this.username);

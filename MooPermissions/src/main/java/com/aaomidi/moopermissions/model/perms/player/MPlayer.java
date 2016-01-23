@@ -334,12 +334,12 @@ public class MPlayer {
             return effectivePermissions;
 
         effectivePermissions = new LinkedHashMap<>();
-        GroupFileRegistry groupFileRegistry = instance.getDataManager().getGroupFileRegistry();
+        effectivePermissions.putAll(GroupFileRegistry.getDefaultGroup().getPermissions());
 
 
         for (PlayerGroup playerGroup : groups.values()) {
             String groupName = playerGroup.getName();
-            Group group = groupFileRegistry.getGroup(groupName);
+            Group group = GroupFileRegistry.getGroup(groupName);
             if (group == null) {
                 //StringManager.log(Level.WARNING, "Player %s had group %s but was not defined in server.", name, groupName);
                 continue;
@@ -348,7 +348,6 @@ public class MPlayer {
             effectivePermissions.putAll(group.getPermissions());
         }
 
-        effectivePermissions.putAll(groupFileRegistry.getDefaultGroup().getPermissions());
         effectivePermissions.putAll(getPlayerSpecificPermissions());
 
         return effectivePermissions;
@@ -379,6 +378,7 @@ public class MPlayer {
 
             effectivePermissions = null;
 
+
             if (permissionAttachment != null) {
                 Player player = getPlayer();
                 if (player != null) {
@@ -395,6 +395,7 @@ public class MPlayer {
         }
     }
 
+
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
     }
@@ -403,6 +404,10 @@ public class MPlayer {
     public void update(MPlayer mPlayer) {
         try {
             lock.lock();
+            if (mPlayer.getGroups().values().containsAll(getGroups().values()) && mPlayer.getPermissionList().values().containsAll(getPermissionList().values())) {
+                return;
+            }
+
             this.groups.clear();
             this.groups.putAll(mPlayer.getGroups());
 

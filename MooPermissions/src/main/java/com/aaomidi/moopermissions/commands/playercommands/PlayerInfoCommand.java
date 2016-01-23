@@ -75,7 +75,6 @@ public class PlayerInfoCommand extends MPlayerCommand {
 
         i = 1;
         for (PlayerPermission playerPermission : mPlayer.getPermissionList().values()) {
-            StringManager.log(Level.INFO, "CREATION: " + playerPermission.getCreation().getTime() + "");
 
             String creation = MCommand.DATE_FORMAT.format(playerPermission.getCreation());
             sb
