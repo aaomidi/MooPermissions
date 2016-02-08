@@ -54,7 +54,13 @@ public class CacheManager {
                         break;
 
                     MPlayer mPlayer = queue.removeFirst();
-                    if (mPlayer == null || mPlayer.getPlayer() == null) continue;
+                    if (mPlayer == null)
+                        continue;
+                    // Removes mplayers without parents.
+                    if (mPlayer.getPlayer() == null) {
+                        cleanUpPlayer(mPlayer);
+                        continue;
+                    }
                     MPlayer newPlayer = instance.getMySQL().getPlayer(mPlayer.getId(), mPlayer.getName(), mPlayer.getUuid());
                     mPlayer.update(newPlayer);
                     queue.addLast(mPlayer);
@@ -102,7 +108,7 @@ public class CacheManager {
     }
 
     public MPlayer getPlayer(String playerName) {
-        Player player = Bukkit.getPlayer(playerName);
+        Player player = Bukkit.getPlayerExact(playerName);
         if (player != null) {
             return getPlayer(player);
         }
@@ -139,6 +145,15 @@ public class CacheManager {
             playerUUIDMap.remove(player.getUniqueId());
 
             queue.remove(mPlayer);
+        }
+    }
+
+    public void cleanUpPlayer(MPlayer mPlayer) {
+        playerUUIDMap.remove(mPlayer.getUuid());
+        playerNameMap.remove(mPlayer.getName());
+        Player player = mPlayer.getPlayer();
+        if (player != null) {
+            playerReferenceMap.remove(player);
         }
     }
 }

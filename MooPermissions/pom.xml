@@ -14,5 +14,14 @@
     <artifactId>MooPermissions</artifactId>
     <version>1.0</version>
 
+    <dependencies>
+        <dependency>
+            <groupId>net.ess3</groupId>
+            <artifactId>Essentials</artifactId>
+            <version>2.14-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>D:/Dropbox/Coding/Java/NewCowCraft/MooPerms/lib/Essentials.jar</systemPath>
+        </dependency>
+    </dependencies>
 
 </project>

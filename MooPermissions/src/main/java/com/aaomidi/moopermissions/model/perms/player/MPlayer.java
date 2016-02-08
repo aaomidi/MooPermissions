@@ -357,7 +357,7 @@ public class MPlayer {
         try {
             lock.lock();
             Player player = getPlayer();
-            if (player == null) return false;
+            if (player == null) return true;
 
             permissionAttachment = player.addAttachment(instance);
             for (Map.Entry<String, Boolean> effectivePerm : getEffectivePermissions().entrySet()) {

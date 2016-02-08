@@ -19,11 +19,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class ConnectionEvent implements Listener {
     private final MooPermissions instance;
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
         instance.getCacheManager().initializePlayer(player);
-
     }
 
     @EventHandler

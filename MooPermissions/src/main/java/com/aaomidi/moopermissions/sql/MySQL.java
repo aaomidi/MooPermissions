@@ -93,6 +93,8 @@ public class MySQL extends SQLConnector {
             String playerName = player.getName().toLowerCase();
 
             String selectID = "SELECT id, name FROM mooperms_index WHERE uuidH=? AND uuidL=?";
+            String updateTimeStamp = "UPDATE mooperms_index SET ts=CURRENT_TIMESTAMP where id=?";
+            String updateOtherNames = "UPDATE mooperms_index SET name=null WHERE name=?";
             String updateName = "UPDATE mooperms_index SET name=? WHERE id=?";
             String initPlayer = "INSERT IGNORE INTO mooperms_index(uuidH, uuidL, name) VALUES (?, ?, ?)";
             ResultSet rs = executeQuery(selectID, uuidH, uuidL);
@@ -110,7 +112,11 @@ public class MySQL extends SQLConnector {
 
             // Update name if needed.
             if (!playerName.equalsIgnoreCase(databaseName)) {
+                executeUpdate(updateOtherNames, playerName);
                 executeUpdate(updateName, playerName, id);
+            } else {
+                // Self mending database.
+                executeUpdate(updateTimeStamp, id);
             }
 
             return getPlayer(id, playerName, player.getUniqueId());

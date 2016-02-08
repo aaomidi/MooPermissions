@@ -8,12 +8,15 @@ import com.aaomidi.moopermissions.engine.CommandHandler;
 import com.aaomidi.moopermissions.events.ConnectionEvent;
 import com.aaomidi.moopermissions.sql.MySQL;
 import com.aaomidi.moopermissions.utils.StringManager;
+import com.earth2me.essentials.Essentials;
 import lombok.Getter;
 import net.milkbowl.vault.Vault;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.util.logging.Level;
@@ -56,6 +59,7 @@ public class MooPermissions extends JavaPlugin {
 
         cacheManager = new CacheManager(this);
         this.hookToVault();
+        this.hookToEssentials();
     }
 
     @Override
@@ -94,5 +98,29 @@ public class MooPermissions extends JavaPlugin {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private void hookToEssentials() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                try {
+                    Plugin plugin = getServer().getPluginManager().getPlugin("Essentials");
+                    if (plugin == null) {
+                        StringManager.log("Essentials not on server.");
+                        return;
+                    }
+                    Essentials essentials = (Essentials) plugin;
+                    StringManager.log("Hooked into ess :)");
+
+                    essentials.getPermissionsHandler().setUseSuperperms(true);
+                    essentials.getPermissionsHandler().checkPermissions();
+                    StringManager.log("setUserPerms set to true!");
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }.runTaskLater(this, 5L);
     }
 }
