@@ -1,6 +1,5 @@
 ## Java
 *.class
-*.jar
 *.war
 *.ear
 
@@ -22,6 +21,7 @@ nb-configuration.xml
 *.ipr
 *.iws
 .idea/
+jar/
 
 ## Windows
 Thumbs.db
