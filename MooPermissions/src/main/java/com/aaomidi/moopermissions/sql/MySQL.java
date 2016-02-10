@@ -43,8 +43,7 @@ public class MySQL extends SQLConnector {
 
     public void registerGroups() {
         String query = "SELECT * FROM mooperms_gindex";
-        try {
-            ResultSet rs = executeQuery(query);
+        try (ResultSet rs = executeQuery(query)) {
             if (!rs.next()) {
                 StringManager.log(Level.WARNING, "No groups defined");
                 return;
@@ -63,11 +62,10 @@ public class MySQL extends SQLConnector {
     }
 
     public MPlayer getPlayer(String playerName) {
-        try {
-            playerName = playerName.toLowerCase();
-            String selectID = "SELECT * FROM mooperms_index WHERE name=? ORDER BY ts DESC LIMIT 1";
-            ResultSet rs = executeQuery(selectID, playerName);
+        playerName = playerName.toLowerCase();
+        String selectID = "SELECT * FROM mooperms_index WHERE name=? ORDER BY ts DESC LIMIT 1";
 
+        try (ResultSet rs = executeQuery(selectID, playerName)) {
             if (!rs.next()) {
                 StringManager.log(Level.WARNING, "No player found with the name " + playerName);
                 return null;
@@ -86,18 +84,18 @@ public class MySQL extends SQLConnector {
     }
 
     public MPlayer initPlayer(Player player, boolean indexFirst) {
-        try {
-            long uuidH = player.getUniqueId().getMostSignificantBits();
-            long uuidL = player.getUniqueId().getLeastSignificantBits();
-            // Store names as lower case characters.
-            String playerName = player.getName().toLowerCase();
+        long uuidH = player.getUniqueId().getMostSignificantBits();
+        long uuidL = player.getUniqueId().getLeastSignificantBits();
+        // Store names as lower case characters.
+        String playerName = player.getName().toLowerCase();
 
-            String selectID = "SELECT id, name FROM mooperms_index WHERE uuidH=? AND uuidL=?";
-            String updateTimeStamp = "UPDATE mooperms_index SET ts=CURRENT_TIMESTAMP where id=?";
-            String updateOtherNames = "UPDATE mooperms_index SET name=null WHERE name=?";
-            String updateName = "UPDATE mooperms_index SET name=? WHERE id=?";
-            String initPlayer = "INSERT IGNORE INTO mooperms_index(uuidH, uuidL, name) VALUES (?, ?, ?)";
-            ResultSet rs = executeQuery(selectID, uuidH, uuidL);
+        String selectID = "SELECT id, name FROM mooperms_index WHERE uuidH=? AND uuidL=?";
+        String updateTimeStamp = "UPDATE mooperms_index SET ts=CURRENT_TIMESTAMP where id=?";
+        String updateOtherNames = "UPDATE mooperms_index SET name=null WHERE name=?";
+        String updateName = "UPDATE mooperms_index SET name=? WHERE id=?";
+        String initPlayer = "INSERT IGNORE INTO mooperms_index(uuidH, uuidL, name) VALUES (?, ?, ?)";
+
+        try (ResultSet rs = executeQuery(selectID, uuidH, uuidL)) {
             if (!rs.next()) {
                 if (!indexFirst) {
                     StringManager.log(Level.SEVERE, "Issue when initializing a player. -Index");
@@ -127,22 +125,24 @@ public class MySQL extends SQLConnector {
     }
 
     public MPlayer getPlayer(int id, String playerName, UUID uuid) {
+        Map<String, PlayerGroup> groups = new HashMap<>();
+        String selectGroups = "SELECT * FROM mooperms_groups WHERE pid=?";
+        String selectPermissions = "SELECT * FROM mooperms_perms WHERE pid=?";
+
+        String cleanGroups = "DELETE FROM mooperms_groups WHERE pid=? AND expiration!=0 AND expiration < NOW()";
+        String cleanPermissions = "DELETE FROM mooperms_perms WHERE pid=? AND expiration!=0 AND expiration < NOW()";
+
         try {
-            String selectGroups = "SELECT * FROM mooperms_groups WHERE pid=?";
-            String selectPermissions = "SELECT * FROM mooperms_perms WHERE pid=?";
-
-            String cleanGroups = "DELETE FROM mooperms_groups WHERE pid=? AND expiration!=0 AND expiration < NOW()";
-            String cleanPermissions = "DELETE FROM mooperms_perms WHERE pid=? AND expiration!=0 AND expiration < NOW()";
-
              /* Remove expired permissions */
             executeUpdate(cleanGroups, id);
             executeUpdate(cleanPermissions, id);
             /* End removing expired permissions */
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
 
-            ResultSet rs = executeQuery(selectGroups, id);
-
-            Map<String, PlayerGroup> groups = new HashMap<>();
-
+        try (ResultSet rs = executeQuery(selectGroups, id)) {
             if (!rs.next()) {
                 // StringManager.log(Level.WARNING, "No groups found for %s.", playerName);
             } else {
@@ -161,8 +161,12 @@ public class MySQL extends SQLConnector {
                     groups.put(playerGroup.getName(), playerGroup);
                 } while (rs.next());
             }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
 
-            rs = executeQuery(selectPermissions, id);
+        try (ResultSet rs = executeQuery(selectPermissions, id)) {
 
             Map<String, PlayerPermission> permissions = new HashMap<>();
             if (!rs.next()) {
@@ -178,8 +182,7 @@ public class MySQL extends SQLConnector {
             }
 
 
-            MPlayer mPlayer = new MPlayer(getInstance(), id, uuid, playerName, groups, permissions);
-            return mPlayer;
+            return new MPlayer(getInstance(), id, uuid, playerName, groups, permissions);
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
@@ -204,8 +207,7 @@ public class MySQL extends SQLConnector {
             return null;
         }
 
-        try {
-            ResultSet rs = executeQuery(query2, groupName);
+        try (ResultSet rs = executeQuery(query2, groupName)) {
             if (!rs.next()) {
                 StringManager.log(Level.SEVERE, "No group registered.");
                 return null;
@@ -276,9 +278,7 @@ public class MySQL extends SQLConnector {
             return null;
         }
 
-        try {
-            ResultSet rs = executeQuery(query2, mPlayer.getId(), gid);
-
+        try (ResultSet rs = executeQuery(query2, mPlayer.getId(), gid)) {
             if (!rs.next()) {
                 StringManager.log(Level.SEVERE, "AddGroup ID returned null");
                 return null;
@@ -361,9 +361,7 @@ public class MySQL extends SQLConnector {
             return null;
         }
 
-        try {
-            ResultSet rs = executeQuery(query2, mPlayer.getId(), permission);
-
+        try (ResultSet rs = executeQuery(query2, mPlayer.getId(), permission)) {
             if (!rs.next()) {
                 StringManager.log(Level.SEVERE, "AddPermission ID returned null");
                 return null;

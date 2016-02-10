@@ -116,8 +116,7 @@ public class SQLConnector {
             logger.log(Level.SEVERE, "The number of ? did not match the number of parameters.");
             return -1;
         }
-        try {
-            PreparedStatement statement = prepareStatement(query, parameterCount, parameters);
+        try (PreparedStatement statement = prepareStatement(query, parameterCount, parameters)) {
             return statement.executeUpdate();
         } catch (Exception ex) {
             logger.log(Level.SEVERE, String.format("There was a problem executing the following query: %s \n Stack Trace: %s", query, ex));
