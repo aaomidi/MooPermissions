@@ -33,4 +33,5 @@ $RECYCLE.BIN/
 .*
 !.gitattributes
 !.gitignore
+!.gitlab-ci.yml
 *~
