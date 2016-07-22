@@ -20,6 +20,8 @@ public class CacheManager {
     private final Map<Player, MPlayer> playerReferenceMap = new HashMap<>();
     private final Map<String, MPlayer> playerNameMap = new HashMap<>();
     private final Map<UUID, MPlayer> playerUUIDMap = new HashMap<>();
+    // Login level lock.
+    private final Set<Player> lockedPlayers = Collections.newSetFromMap(new WeakHashMap<>());
 
     private final Cache<String, MPlayer> playerNameCache = CacheBuilder
             .newBuilder()
@@ -133,6 +135,18 @@ public class CacheManager {
 
     public boolean isPlayerCached(String playerName) {
         return playerNameCache.getIfPresent(playerName.toLowerCase()) != null;
+    }
+
+    public void lockPlayer(Player player) {
+        instance.getServer().getScheduler().runTask(instance, () -> lockedPlayers.add(player));
+    }
+
+    public void unlockPLayer(Player player) {
+        instance.getServer().getScheduler().runTask(instance, () -> lockedPlayers.remove(player));
+    }
+
+    public boolean isLocked(Player player) {
+        return lockedPlayers.contains(player);
     }
 
     public void cleanUpPlayer(Player player) {
