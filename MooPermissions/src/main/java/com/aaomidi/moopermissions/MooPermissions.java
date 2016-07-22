@@ -5,6 +5,7 @@ import com.aaomidi.moopermissions.data.ConfigReader;
 import com.aaomidi.moopermissions.data.DataManager;
 import com.aaomidi.moopermissions.engine.CacheManager;
 import com.aaomidi.moopermissions.engine.CommandHandler;
+import com.aaomidi.moopermissions.events.BlockingEvent;
 import com.aaomidi.moopermissions.events.ConnectionEvent;
 import com.aaomidi.moopermissions.sql.MySQL;
 import com.aaomidi.moopermissions.utils.StringManager;
@@ -80,6 +81,7 @@ public class MooPermissions extends JavaPlugin {
 
     private void setupEvents() {
         registerEvent(new ConnectionEvent(this));
+        registerEvent(new BlockingEvent(this));
     }
 
     private void registerEvent(Listener listener) {
