@@ -37,9 +37,9 @@ public class MySQL extends SQLConnector {
 
         String query2 = "CREATE TABLE IF NOT EXISTS mooperms_gindex(id INT NOT NULL AUTO_INCREMENT, name VARCHAR(32) UNIQUE NOT NULL, creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(id))Engine=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-        String query3 = "CREATE TABLE IF NOT EXISTS mooperms_groups(id INT NOT NULL AUTO_INCREMENT, pid INT NOT NULL, gid INT NOT NULL, creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP, expiration TIMESTAMP DEFAULT NULL, PRIMARY KEY(id), UNIQUE KEY info(pid, gid), FOREIGN KEY(pid) REFERENCES mooperms_index(id), FOREIGN KEY(gid) REFERENCES mooperms_gindex(id) ON DELETE CASCADE, INDEX(expiration))Engine=InnoDB DEFAULT CHARSET=utf8mb4;";
+        String query3 = "CREATE TABLE IF NOT EXISTS mooperms_groups(id INT NOT NULL AUTO_INCREMENT, pid INT NOT NULL, gid INT NOT NULL, creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP, expiration TIMESTAMP NULL DEFAULT NULL, PRIMARY KEY(id), UNIQUE KEY info(pid, gid), FOREIGN KEY(pid) REFERENCES mooperms_index(id), FOREIGN KEY(gid) REFERENCES mooperms_gindex(id) ON DELETE CASCADE, INDEX(expiration))Engine=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-        String query4 = "CREATE TABLE IF NOT EXISTS mooperms_perms(id INT NOT NULL AUTO_INCREMENT, pid INT NOT NULL, permission VARCHAR(127) NOT NULL, give BOOLEAN NOT NULL, creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP, expiration TIMESTAMP DEFAULT NULL, PRIMARY KEY(id), UNIQUE KEY info(pid, permission), FOREIGN KEY(pid) REFERENCES mooperms_index(id), INDEX (expiration)) Engine=InnoDB DEFAULT CHARSET=utf8mb4;";
+        String query4 = "CREATE TABLE IF NOT EXISTS mooperms_perms(id INT NOT NULL AUTO_INCREMENT, pid INT NOT NULL, permission VARCHAR(127) NOT NULL, give BOOLEAN NOT NULL, creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP, expiration TIMESTAMP NULL DEFAULT NULL, PRIMARY KEY(id), UNIQUE KEY info(pid, permission), FOREIGN KEY(pid) REFERENCES mooperms_index(id), INDEX (expiration)) Engine=InnoDB DEFAULT CHARSET=utf8mb4;";
 
         executeUpdate(query1);
         executeUpdate(query2);
@@ -197,7 +197,7 @@ public class MySQL extends SQLConnector {
                     Date creation = rs.getTimestamp("creation");
                     if (rs.wasNull())
                         creation = null;
-                    
+
                     PlayerPermission playerPermission = new PlayerPermission(rs.getInt("id"), rs.getString("permission"), rs.getBoolean("give"), creation, expiry);
                     permissions.put(playerPermission.getPermission(), playerPermission);
                 } while (rs.next());
