@@ -151,6 +151,16 @@ public class ImportCommand extends MOtherCommand {
 
 					}
 
+                    @Override
+                    public void playSound(Location location, Sound sound, SoundCategory soundCategory, float v, float v1) {
+
+                    }
+
+                    @Override
+                    public void playSound(Location location, String s, SoundCategory soundCategory, float v, float v1) {
+
+                    }
+
 					@Override
 					public void stopSound(Sound sound) {
 
@@ -160,6 +170,16 @@ public class ImportCommand extends MOtherCommand {
 					public void stopSound(String s) {
 
 					}
+
+                    @Override
+                    public void stopSound(Sound sound, SoundCategory soundCategory) {
+
+                    }
+
+                    @Override
+                    public void stopSound(String s, SoundCategory soundCategory) {
+
+                    }
 
 					@Override
 					public void playEffect(Location location, Effect effect, int i) {
@@ -356,6 +376,11 @@ public class ImportCommand extends MOtherCommand {
 
 					}
 
+                    @Override
+                    public void sendTitle(String s, String s1, int i, int i1, int i2) {
+
+                    }
+
 					@Override
 					public void resetTitle() {
 
@@ -481,6 +506,11 @@ public class ImportCommand extends MOtherCommand {
 						return null;
 					}
 
+                    @Override
+                    public InventoryView openMerchant(Merchant merchant, boolean b) {
+                        return null;
+                    }
+
 					@Override
 					public void closeInventory() {
 
@@ -550,6 +580,11 @@ public class ImportCommand extends MOtherCommand {
 					public boolean hasPotionEffect(PotionEffectType potionEffectType) {
 						return false;
 					}
+
+                    @Override
+                    public PotionEffect getPotionEffect(PotionEffectType potionEffectType) {
+                        return null;
+                    }
 
 					@Override
 					public void removePotionEffect(PotionEffectType potionEffectType) {
@@ -655,6 +690,21 @@ public class ImportCommand extends MOtherCommand {
 					public boolean setPassenger(Entity entity) {
 						return false;
 					}
+
+                    @Override
+                    public List<Entity> getPassengers() {
+                        return null;
+                    }
+
+                    @Override
+                    public boolean addPassenger(Entity entity) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean removePassenger(Entity entity) {
+                        return false;
+                    }
 
 					@Override
 					public boolean eject() {
@@ -786,6 +836,11 @@ public class ImportCommand extends MOtherCommand {
 
 					}
 
+                    @Override
+                    public void setResourcePack(String s, byte[] bytes) {
+
+                    }
+
 					@Override
 					public void setAI(boolean b) {
 
@@ -795,6 +850,31 @@ public class ImportCommand extends MOtherCommand {
 					public void setGravity(boolean b) {
 
 					}
+
+                    @Override
+                    public int getPortalCooldown() {
+                        return 0;
+                    }
+
+                    @Override
+                    public void setPortalCooldown(int i) {
+
+                    }
+
+                    @Override
+                    public Set<String> getScoreboardTags() {
+                        return null;
+                    }
+
+                    @Override
+                    public boolean addScoreboardTag(String s) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean removeScoreboardTag(String s) {
+                        return false;
+                    }
 
 					@Override
 					public String getDisplayName() {
@@ -1091,6 +1171,21 @@ public class ImportCommand extends MOtherCommand {
 
 					}
 
+                    @Override
+                    public boolean hasCooldown(Material material) {
+                        return false;
+                    }
+
+                    @Override
+                    public int getCooldown(Material material) {
+                        return 0;
+                    }
+
+                    @Override
+                    public void setCooldown(Material material, int i) {
+
+                    }
+
 					@Override
 					public boolean isSleeping() {
 						return false;
@@ -1115,6 +1210,11 @@ public class ImportCommand extends MOtherCommand {
 					public boolean isBlocking() {
 						return false;
 					}
+
+                    @Override
+                    public boolean isHandRaised() {
+                        return false;
+                    }
 
 					@Override
 					public int getExpToLevel() {
@@ -1280,6 +1380,16 @@ public class ImportCommand extends MOtherCommand {
 					public void setVelocity(Vector vector) {
 
 					}
+
+                    @Override
+                    public double getHeight() {
+                        return 0;
+                    }
+
+                    @Override
+                    public double getWidth() {
+                        return 0;
+                    }
 
 					@Override
 					public World getWorld() {

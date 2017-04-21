@@ -142,8 +142,8 @@ public class MySQL extends SQLConnector {
         String selectGroups = "SELECT * FROM mooperms_groups WHERE pid=?";
         String selectPermissions = "SELECT * FROM mooperms_perms WHERE pid=?";
 
-        String cleanGroups = "DELETE FROM mooperms_groups WHERE pid=? AND expiration!=0 AND expiration < NOW()";
-        String cleanPermissions = "DELETE FROM mooperms_perms WHERE pid=? AND expiration!=0 AND expiration < NOW()";
+        String cleanGroups = "DELETE FROM mooperms_groups WHERE pid=? AND expiration < NOW()";
+        String cleanPermissions = "DELETE FROM mooperms_perms WHERE pid=? AND expiration < NOW()";
 
         try {
              /* Remove expired permissions */
@@ -161,7 +161,12 @@ public class MySQL extends SQLConnector {
             } else {
                 do {
                     Date expiry = rs.getTimestamp("expiration");
+                    if (rs.wasNull())
+                        expiry = null;
+
                     Date creation = rs.getTimestamp("creation");
+                    if (rs.wasNull())
+                        creation = null;
 
                     int gid = rs.getInt("gid");
 
@@ -187,8 +192,12 @@ public class MySQL extends SQLConnector {
             } else {
                 do {
                     Date expiry = rs.getTimestamp("expiration");
+                    if (rs.wasNull())
+                        expiry = null;
                     Date creation = rs.getTimestamp("creation");
-
+                    if (rs.wasNull())
+                        creation = null;
+                    
                     PlayerPermission playerPermission = new PlayerPermission(rs.getInt("id"), rs.getString("permission"), rs.getBoolean("give"), creation, expiry);
                     permissions.put(playerPermission.getPermission(), playerPermission);
                 } while (rs.next());
@@ -227,6 +236,9 @@ public class MySQL extends SQLConnector {
             }
             int gid = rs.getInt("id");
             Date creation = rs.getTimestamp("creation");
+
+            if (rs.wasNull())
+                creation = null;
 
             GroupIndexRegistry.register(gid, groupName, creation);
             return gid;
@@ -299,9 +311,19 @@ public class MySQL extends SQLConnector {
 
             int id = rs.getInt("id");
             Date expiryRS = rs.getTimestamp("expiration");
+            if (rs.wasNull())
+                expiryRS = null;
+
             Date creationRS = rs.getTimestamp("creation");
+            if (rs.wasNull())
+                creationRS = null;
 
             if (expiration > 0) {
+                if (expiryRS == null) {
+                    StringManager.log(Level.SEVERE, "TIMESTAMP SHOULD NOT HAVE RETURNED NULL");
+                    return null;
+                }
+
                 if (expiration / 1000 != expiryRS.getTime() / 1000) {
                     StringManager.log(Level.SEVERE, "Time: " + ts.getTime() + " RSTime:" + expiryRS.getTime());
                     StringManager.log(Level.SEVERE, "Expiration date mismatch");
@@ -382,9 +404,18 @@ public class MySQL extends SQLConnector {
 
             int id = rs.getInt("id");
             Date expiryRS = rs.getTimestamp("expiration");
+            if (rs.wasNull())
+                expiryRS = null;
             Date creationRS = rs.getTimestamp("creation");
+            if (rs.wasNull())
+                creationRS = null;
 
             if (expiration > 0) {
+                if (expiryRS == null) {
+                    StringManager.log(Level.SEVERE, "TIMESTAMP SHOULD NOT HAVE RETURNED NULL");
+                    return null;
+                }
+
                 if (expiration / 1000 != expiryRS.getTime() / 1000) {
                     StringManager.log(Level.SEVERE, "Time: " + ts.getTime() + " RSTime:" + expiryRS.getTime());
                     StringManager.log(Level.SEVERE, "Expiration date mismatch");
