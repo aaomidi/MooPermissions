@@ -324,11 +324,8 @@ public class MySQL extends SQLConnector {
                     return null;
                 }
 
-                if (expiration / 1000 != expiryRS.getTime() / 1000) {
-                    StringManager.log(Level.SEVERE, "Time: " + ts.getTime() + " RSTime:" + expiryRS.getTime());
-                    StringManager.log(Level.SEVERE, "Expiration date mismatch");
-                    return null;
-                }
+                StringManager.log(Level.FINE, "Time: " + ts.getTime() + " RSTime:" + expiryRS.getTime());
+
             }
             return new PlayerGroup(id, gid, creationRS, expiryRS, GroupIndexRegistry.getSQLGroup(gid));
         } catch (Exception ex) {
@@ -416,11 +413,8 @@ public class MySQL extends SQLConnector {
                     return null;
                 }
 
-                if (expiration / 1000 != expiryRS.getTime() / 1000) {
-                    StringManager.log(Level.SEVERE, "Time: " + ts.getTime() + " RSTime:" + expiryRS.getTime());
-                    StringManager.log(Level.SEVERE, "Expiration date mismatch");
-                    return null;
-                }
+                StringManager.log(Level.FINE, "Time: " + ts.getTime() + " RSTime:" + expiryRS.getTime());
+
             }
             return new PlayerPermission(id, permission, give, creationRS, expiryRS);
         } catch (Exception ex) {
