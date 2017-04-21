@@ -149,6 +149,8 @@ public class SQLConnector {
                 statement.setFloat(j, (Float) parameter);
             } else if (parameter instanceof Boolean) {
                 statement.setBoolean(j, (Boolean) parameter);
+            } else if (parameter instanceof Deadbabe) {
+                statement.setNull(j, ((Deadbabe) parameter).type);
             } else {
                 statement.setObject(j, parameter);
             }
