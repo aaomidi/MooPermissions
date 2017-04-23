@@ -9,6 +9,7 @@ import com.aaomidi.moopermissions.utils.StringManager;
 import org.bukkit.entity.Player;
 
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,8 @@ import java.util.logging.Level;
  * Created by amir on 2015-12-14.
  */
 public class MySQL extends SQLConnector {
+    public final Deadbabe timestampDeadbabe = new Deadbabe(Types.TIMESTAMP);
+
     public MySQL(MooPermissions instance, String host, int port, String username, String password, String database) {
         super(instance, host, port, username, password, database);
         this.biteMyShinyMetalAss();
@@ -31,9 +34,12 @@ public class MySQL extends SQLConnector {
      */
     private void biteMyShinyMetalAss() {
         String query1 = "CREATE TABLE IF NOT EXISTS mooperms_index(id INT NOT NULL AUTO_INCREMENT, uuidH BIGINT NOT NULL, uuidL BIGINT NOT NULL, name VARCHAR(16), ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY(id), UNIQUE KEY uuid(uuidH, uuidL), INDEX(name))Engine=InnoDB DEFAULT CHARSET=utf8mb4;";
+
         String query2 = "CREATE TABLE IF NOT EXISTS mooperms_gindex(id INT NOT NULL AUTO_INCREMENT, name VARCHAR(32) UNIQUE NOT NULL, creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(id))Engine=InnoDB DEFAULT CHARSET=utf8mb4;";
-        String query3 = "CREATE TABLE IF NOT EXISTS mooperms_groups(id INT NOT NULL AUTO_INCREMENT, pid INT NOT NULL, gid INT NOT NULL, creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP, expiration TIMESTAMP NOT NULL DEFAULT 0, PRIMARY KEY(id), UNIQUE KEY info(pid, gid), FOREIGN KEY(pid) REFERENCES mooperms_index(id), FOREIGN KEY(gid) REFERENCES mooperms_gindex(id) ON DELETE CASCADE, INDEX(expiration))Engine=InnoDB DEFAULT CHARSET=utf8mb4;";
-        String query4 = "CREATE TABLE IF NOT EXISTS mooperms_perms(id INT NOT NULL AUTO_INCREMENT, pid INT NOT NULL, permission VARCHAR(127) NOT NULL, give BOOLEAN NOT NULL, creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP, expiration TIMESTAMP NOT NULL DEFAULT 0, PRIMARY KEY(id), UNIQUE KEY info(pid, permission), FOREIGN KEY(pid) REFERENCES mooperms_index(id), INDEX (expiration)) Engine=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+        String query3 = "CREATE TABLE IF NOT EXISTS mooperms_groups(id INT NOT NULL AUTO_INCREMENT, pid INT NOT NULL, gid INT NOT NULL, creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP, expiration TIMESTAMP NULL DEFAULT NULL, PRIMARY KEY(id), UNIQUE KEY info(pid, gid), FOREIGN KEY(pid) REFERENCES mooperms_index(id), FOREIGN KEY(gid) REFERENCES mooperms_gindex(id) ON DELETE CASCADE, INDEX(expiration))Engine=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+        String query4 = "CREATE TABLE IF NOT EXISTS mooperms_perms(id INT NOT NULL AUTO_INCREMENT, pid INT NOT NULL, permission VARCHAR(127) NOT NULL, give BOOLEAN NOT NULL, creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP, expiration TIMESTAMP NULL DEFAULT NULL, PRIMARY KEY(id), UNIQUE KEY info(pid, permission), FOREIGN KEY(pid) REFERENCES mooperms_index(id), INDEX (expiration)) Engine=InnoDB DEFAULT CHARSET=utf8mb4;";
 
         executeUpdate(query1);
         executeUpdate(query2);
@@ -83,7 +89,14 @@ public class MySQL extends SQLConnector {
         }
     }
 
-    public MPlayer initPlayer(Player player, boolean indexFirst) {
+    /**
+     * Initializes a player
+     *
+     * @param player
+     * @param indexFirst first entrance to function.
+     * @return
+     */
+    private MPlayer initPlayer(Player player, boolean indexFirst) {
         long uuidH = player.getUniqueId().getMostSignificantBits();
         long uuidL = player.getUniqueId().getLeastSignificantBits();
         // Store names as lower case characters.
@@ -129,8 +142,8 @@ public class MySQL extends SQLConnector {
         String selectGroups = "SELECT * FROM mooperms_groups WHERE pid=?";
         String selectPermissions = "SELECT * FROM mooperms_perms WHERE pid=?";
 
-        String cleanGroups = "DELETE FROM mooperms_groups WHERE pid=? AND expiration!=0 AND expiration < NOW()";
-        String cleanPermissions = "DELETE FROM mooperms_perms WHERE pid=? AND expiration!=0 AND expiration < NOW()";
+        String cleanGroups = "DELETE FROM mooperms_groups WHERE pid=? AND expiration < NOW()";
+        String cleanPermissions = "DELETE FROM mooperms_perms WHERE pid=? AND expiration < NOW()";
 
         try {
              /* Remove expired permissions */
@@ -148,7 +161,12 @@ public class MySQL extends SQLConnector {
             } else {
                 do {
                     Date expiry = rs.getTimestamp("expiration");
+                    if (rs.wasNull())
+                        expiry = null;
+
                     Date creation = rs.getTimestamp("creation");
+                    if (rs.wasNull())
+                        creation = null;
 
                     int gid = rs.getInt("gid");
 
@@ -174,7 +192,11 @@ public class MySQL extends SQLConnector {
             } else {
                 do {
                     Date expiry = rs.getTimestamp("expiration");
+                    if (rs.wasNull())
+                        expiry = null;
                     Date creation = rs.getTimestamp("creation");
+                    if (rs.wasNull())
+                        creation = null;
 
                     PlayerPermission playerPermission = new PlayerPermission(rs.getInt("id"), rs.getString("permission"), rs.getBoolean("give"), creation, expiry);
                     permissions.put(playerPermission.getPermission(), playerPermission);
@@ -214,6 +236,9 @@ public class MySQL extends SQLConnector {
             }
             int gid = rs.getInt("id");
             Date creation = rs.getTimestamp("creation");
+
+            if (rs.wasNull())
+                creation = null;
 
             GroupIndexRegistry.register(gid, groupName, creation);
             return gid;
@@ -267,7 +292,7 @@ public class MySQL extends SQLConnector {
         Date ts = new Date(expiration);
         try {
             if (expiration <= 0) {
-                executeUpdate(query1, mPlayer.getId(), gid, 0);
+                executeUpdate(query1, mPlayer.getId(), gid, timestampDeadbabe);
 
             } else {
                 executeUpdate(query1, mPlayer.getId(), gid, ts);
@@ -286,14 +311,21 @@ public class MySQL extends SQLConnector {
 
             int id = rs.getInt("id");
             Date expiryRS = rs.getTimestamp("expiration");
+            if (rs.wasNull())
+                expiryRS = null;
+
             Date creationRS = rs.getTimestamp("creation");
+            if (rs.wasNull())
+                creationRS = null;
 
             if (expiration > 0) {
-                if (expiration / 1000 != expiryRS.getTime() / 1000) {
-                    StringManager.log(Level.SEVERE, "Time: " + ts.getTime() + " RSTime:" + expiryRS.getTime());
-                    StringManager.log(Level.SEVERE, "Expiration date mismatch");
+                if (expiryRS == null) {
+                    StringManager.log(Level.SEVERE, "TIMESTAMP SHOULD NOT HAVE RETURNED NULL");
                     return null;
                 }
+
+                StringManager.log(Level.FINE, "Time: " + ts.getTime() + " RSTime:" + expiryRS.getTime());
+
             }
             return new PlayerGroup(id, gid, creationRS, expiryRS, GroupIndexRegistry.getSQLGroup(gid));
         } catch (Exception ex) {
@@ -351,7 +383,7 @@ public class MySQL extends SQLConnector {
 
         try {
             if (expiration <= 0) {
-                executeUpdate(query1, mPlayer.getId(), permission, give, 0);
+                executeUpdate(query1, mPlayer.getId(), permission, give, timestampDeadbabe);
             } else {
                 executeUpdate(query1, mPlayer.getId(), permission, give, ts);
             }
@@ -369,14 +401,20 @@ public class MySQL extends SQLConnector {
 
             int id = rs.getInt("id");
             Date expiryRS = rs.getTimestamp("expiration");
+            if (rs.wasNull())
+                expiryRS = null;
             Date creationRS = rs.getTimestamp("creation");
+            if (rs.wasNull())
+                creationRS = null;
 
             if (expiration > 0) {
-                if (expiration / 1000 != expiryRS.getTime() / 1000) {
-                    StringManager.log(Level.SEVERE, "Time: " + ts.getTime() + " RSTime:" + expiryRS.getTime());
-                    StringManager.log(Level.SEVERE, "Expiration date mismatch");
+                if (expiryRS == null) {
+                    StringManager.log(Level.SEVERE, "TIMESTAMP SHOULD NOT HAVE RETURNED NULL");
                     return null;
                 }
+
+                StringManager.log(Level.FINE, "Time: " + ts.getTime() + " RSTime:" + expiryRS.getTime());
+
             }
             return new PlayerPermission(id, permission, give, creationRS, expiryRS);
         } catch (Exception ex) {

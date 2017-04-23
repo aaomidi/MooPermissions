@@ -139,21 +139,29 @@ public class SQLConnector {
 
         for (int i = 0, j = 1; i < parameterCount; i++, j++) {
             parameter = parameters[i];
-            if (parameter instanceof String) {
-                statement.setString(j, (String) parameter);
-            } else if (parameter instanceof Integer) {
-                statement.setInt(j, (Integer) parameter);
-            } else if (parameter instanceof Double) {
-                statement.setDouble(j, (Double) parameter);
-            } else if (parameter instanceof Float) {
-                statement.setFloat(j, (Float) parameter);
-            } else if (parameter instanceof Boolean) {
-                statement.setBoolean(j, (Boolean) parameter);
-            } else {
-                statement.setObject(j, parameter);
+            switch (parameter.getClass().getSimpleName()) {
+                case "String":
+                    statement.setString(j, (String) parameter);
+                    break;
+                case "Integer":
+                    statement.setInt(j, (Integer) parameter);
+                    break;
+                case "Double":
+                    statement.setDouble(j, (Double) parameter);
+                    break;
+                case "Float":
+                    statement.setFloat(j, (Float) parameter);
+                    break;
+                case "Boolean":
+                    statement.setBoolean(j, (Boolean) parameter);
+                    break;
+                case "Deadbabe":
+                    statement.setNull(j, ((Deadbabe) parameter).type);
+                    break;
+                default:
+                    statement.setObject(j, parameter);
             }
         }
-
         return statement;
     }
 

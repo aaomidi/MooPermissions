@@ -53,6 +53,7 @@ public class PlayerInfoCommand extends MPlayerCommand {
         for (PlayerGroup group : playerGroups) {
             StringManager.log(Level.INFO, "CREATION: " + group.getCreation().getTime() + "");
 
+
             String creation = MCommand.DATE_FORMAT.format(group.getCreation());
             sb
                     .append("\n&d")
