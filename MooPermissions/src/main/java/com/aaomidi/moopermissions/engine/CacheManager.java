@@ -80,9 +80,9 @@ public class CacheManager {
         }.runTaskTimer(instance, 95L, 200L);
     }
 
-    public void initializePlayer(Player player) {
+    public MPlayer initializePlayer(Player player) {
         if (playerUUIDMap.containsKey(player.getUniqueId())) {
-            return;
+            return playerUUIDMap.get(player.getUniqueId());
         }
 
         String playerName = player.getName().toLowerCase();
@@ -99,6 +99,8 @@ public class CacheManager {
         playerUUIDMap.put(uuid, mPlayer);
 
         queue.addLast(mPlayer);
+
+        return mPlayer;
     }
 
     public MPlayer getPlayer(UUID uuid) {

@@ -30,33 +30,18 @@ public class ConnectionEvent implements Listener {
         final Player player = event.getPlayer();
         instance.getCacheManager().lockPlayer(player);
 
-        instance.getServer().getScheduler().runTaskAsynchronously(instance, () ->
-                instance.getCacheManager().initializePlayer(player));
+        instance.getServer().getScheduler().runTaskAsynchronously(instance, () -> {
+            MPlayer mPlayer = instance.getCacheManager().initializePlayer(player);
 
 
-        instance.getServer().getScheduler().runTask(instance, () -> {
-            instance.getCacheManager().unlockPLayer(player);
-            if (!joinCalled.contains(player)) { // If join hasn't been called yet, then there is no need to apply as it will be applied automatically.
-                return;
-            }
+            instance.getServer().getScheduler().runTask(instance, () -> {
+                instance.getCacheManager().unlockPLayer(player);
 
-            MPlayer mplayer = instance.getCacheManager().getPlayer(player);
-            mplayer.reset();
-            mplayer.apply();
+                mPlayer.reset();
+                mPlayer.apply();
+            });
         });
 
-    }
-
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        if (instance.getCacheManager().isLocked(player)) {
-            joinCalled.add(player);
-            return;
-        }
-        MPlayer mPlayer = instance.getCacheManager().getPlayer(player);
-        mPlayer.reset();
-        mPlayer.apply();
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
